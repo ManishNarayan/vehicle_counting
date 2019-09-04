@@ -46,9 +46,9 @@ if tf.__version__ < '1.14.0':
 # Detection
 def object_detection_function(video_link,id):
     
-    #filename = "video_" + str(id) + "_.mp4"
-    filename = "video_1_61.mp4"
-    #urllib.request.urlretrieve(video_link,filename)
+    filename = "video_" + str(id) + "_.mp4"
+    #filename = "video_1_61.mp4"
+    urllib.request.urlretrieve(video_link,filename)
     cap = cv2.VideoCapture(filename)
     #Use these if you want to know the height and width of the video and set the ROI line Accordingly.
     

@@ -2,9 +2,9 @@ import pandas as  pd
 
 import csv
 import vehicle_detection_main_upd as detect
-model = "faster_rcnn_resnet50_coco_2018_01_28"
 
-survey = pd.read_csv('survey_s.csv',delimiter=',')
+
+survey = pd.read_csv('su.csv',delimiter=',')
 
 
 
