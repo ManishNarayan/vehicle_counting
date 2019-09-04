@@ -8,3 +8,7 @@ You can run using the command -  python vehicle_detection_main.py --video "video
 Change the roi line based on the height and width of your input.
 
 This gives a classified count of the different vehicles - Cars, Trucks, Buses and Person.
+
+### survey_upd.py file can be used to update a csv file with the counts of different vehicles.
+
+Update the .csv file similar to surveys.csv in line 7 of survey_upd.py and make sure you have the permissions.
