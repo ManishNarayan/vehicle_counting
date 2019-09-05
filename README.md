@@ -12,3 +12,5 @@ This gives a classified count of the different vehicles - Cars, Trucks, Buses an
 ### survey_upd.py file can be used to update a csv file with the counts of different vehicles.
 
 Update the .csv file similar to surveys.csv in line 7 of survey_upd.py and make sure you have the permissions.
+
+In line 25 of survey_upd.py You can choose where to store the updated csv file.
