@@ -1,4 +1,6 @@
 # vehicle_counting
+
+### This repo is based on the vehicle counting model of Ahmetzlu : https://github.com/ahmetozlu/vehicle_counting_tensorflow
 You need to add a model from the tensorflow model zoo - https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md into the directory.
 
 Change the model name in line 70 of vehicle_detection_main.py
