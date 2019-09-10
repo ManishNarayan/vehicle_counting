@@ -513,8 +513,12 @@ def visualize_boxes_and_labels_on_image_array(current_frame_number,image,
     
     display_str_list=box_to_display_str_map[box]
     # we are interested just vehicles (i.e. cars and trucks)
-    
+    #print("Str List:",display_str_list)
     #I have added these lines to perform classified detection of the vehicles.
+
+    if "potted plant" in display_str_list[0] and len(display_str_list)>1:
+      display_str_list[0] = display_str_list[1]
+      
     if (("car" in display_str_list[0])):
             is_vehicle_detected, csv_line, update_csv = draw_bounding_box_on_image_array(current_frame_number,
                 image,
