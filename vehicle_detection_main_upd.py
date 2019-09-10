@@ -44,7 +44,7 @@ if tf.__version__ < '1.14.0':
                       )
 
 # Detection
-def object_detection_function(video_link,id):
+def object_detection_function(video_link,model_name,id):
     
     filename = "video_" + str(id) + "_.mp4"
     #filename = "video_1_61.mp4"
@@ -58,12 +58,12 @@ def object_detection_function(video_link,id):
     fps    = int(cap.get(cv2.CAP_PROP_FPS))
     
     
-
+    vis_util.helper(roi)
 
     # By default I use an "SSD with Mobilenet" model here. See the detection model zoo (https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md) for a list of other models that can be run out-of-the-box with varying speeds and accuracies.
     # What model to download.
     
-    MODEL_NAME = "faster_rcnn_resnet50_coco_2018_01_28"
+    MODEL_NAME = model_name
     MODEL_FILE = MODEL_NAME + '.tar.gz'
     DOWNLOAD_BASE = \
         'http://download.tensorflow.org/models/object_detection/'
@@ -185,7 +185,7 @@ def object_detection_function(video_link,id):
                     )
                 cv2.putText(
                     input_frame,
-                    'Bus up:' + str(total_bus[0]) + ' Bus down:' + str(total_bus[1]) + ' P up:' + str(total_person[0])+ ' P down:' + str(total_person[1])+ ' Bike up:' + str(total_motorcycle[0])+ ' B down:' + str(total_motorcycle[1]),
+                    'Bus up:' + str(total_bus[0]) + ' B d:' + str(total_bus[1]) + ' P up:' + str(total_person[0])+ ' P down:' + str(total_person[1])+ ' Bike up:' + str(total_motorcycle[0])+ ' B d:' + str(total_motorcycle[1]),
 
                     (10, 55),
                     font,

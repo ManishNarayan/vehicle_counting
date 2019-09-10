@@ -44,6 +44,7 @@ if tf.__version__ < '1.14.0':
 #video = "video_1_61.mp4"
 parser = argparse.ArgumentParser(description='Vehicle Detection and Classified Counting')
 parser.add_argument('--video', help='Path to video file.')
+parser.add_argument('--model',required=False ,help = 'Path to the model you want to use. Default is Faster Rcnn Resnet50.')
 args = parser.parse_args()
 
 if(args.video):
@@ -54,21 +55,28 @@ if(args.video):
 else:
     print("Error . Please Provide a video file as an argument.")
     sys.exit(1)
-outputFile  = args.video[:-4] + "Faster_out_py.avi"
+outputFile  = args.video[:-4] + "Faster_out_upd_py.avi"
 
 #Use these if you want to know the height and width of the video and set the ROI line Accordingly.
-#height = int( cap.get(cv2.CAP_PROP_FRAME_HEIGHT ))
-#y1 =  int(((height)*2)/3)
-#x2 = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-#print(height)
-#print(x2)
+height = int( cap.get(cv2.CAP_PROP_FRAME_HEIGHT ))
+roi =  int(((height)*2)/3)
+width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+vis_util.helper(roi)
 
 # Variables
 total_passed_vehicle = 0  # using it to count vehicles
 
 # By default I use an "SSD with Mobilenet" model here. See the detection model zoo (https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md) for a list of other models that can be run out-of-the-box with varying speeds and accuracies.
 # What model to download.
-MODEL_NAME = 'faster_rcnn_resnet50_coco_2018_01_28'
+if(args.model):
+    if not os.path.isfile(args.model):
+        print("Input model ", args.model, " doesn't exist")
+        sys.exit(1)
+    MODEL_NAME = args.model
+else:
+    MODEL_NAME = 'faster_rcnn_resnet50_coco_2018_01_28'
+
+
 MODEL_FILE = MODEL_NAME + '.tar.gz'
 DOWNLOAD_BASE = \
     'http://download.tensorflow.org/models/object_detection/'
@@ -110,10 +118,11 @@ def load_image_into_numpy_array(image):
 # Detection
 def object_detection_function():
     total_passed_vehicle = 0
-    total_cars = 0
-    total_trucks = 0
-    total_bus = 0
-    total_person = 0
+    total_cars = [0]*2
+    total_trucks = [0]*2
+    total_bus = [0]*2
+    total_person = [0]*2
+    total_motorcycle = [0]*2
     speed = 'waiting...'
     direction = 'waiting...'
     size = 'waiting...'
@@ -132,7 +141,7 @@ def object_detection_function():
             detection_scores = detection_graph.get_tensor_by_name('detection_scores:0')
             detection_classes = detection_graph.get_tensor_by_name('detection_classes:0')
             num_detections = detection_graph.get_tensor_by_name('num_detections:0')
-
+            print(detection_classes)
             # for all the frames that are extracted from input video
             vid_writer = cv2.VideoWriter(outputFile, cv2.VideoWriter_fourcc('M','J','P','G'), 30, (round(cap.get(cv2.CAP_PROP_FRAME_WIDTH)),round(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))))
             while cap.isOpened():
@@ -152,7 +161,7 @@ def object_detection_function():
                     sess.run([detection_boxes, detection_scores,
                              detection_classes, num_detections],
                              feed_dict={image_tensor: image_np_expanded})
-
+                #print("CLASSESE",classes)
                 # Visualization of the results of a detection.
                 (counter, csv_line) = \
                     vis_util.visualize_boxes_and_labels_on_image_array(
@@ -167,18 +176,37 @@ def object_detection_function():
                     )
 
                 total_passed_vehicle = total_passed_vehicle + sum(counter)
-                total_cars = total_cars + counter[0]
-                total_trucks = total_trucks + counter[1]
-                total_bus = total_bus + counter[2]
-                total_person = total_person + counter[3]
+                if direction == 'up':
+                    total_cars[0] = total_cars[0] + counter[0]
+                    total_trucks[0] = total_trucks[0] + counter[1]
+                    total_bus[0] = total_bus[0] + counter[2]
+                    total_person[0] = total_person[0] + counter[3]
+                    total_motorcycle[0] = total_motorcycle + counter[4]
+                elif direction == "down":
+                    total_cars[1] = total_cars[1] + counter[0]
+                    total_trucks[1] = total_trucks[1] + counter[1]
+                    total_bus[1] = total_bus[1] + counter[2]
+                    total_person[1] = total_person[1] + counter[3]
+                    total_motorcycle[1] = total_motorcycle[1] + counter[4]
                 #print(counter)
                 # insert information text to video frame
                 font = cv2.FONT_HERSHEY_SIMPLEX
                 cv2.putText(
                     input_frame,
-                    'Vehicles: ' + str(total_passed_vehicle) + ' Car: ' + str(total_cars) + ' Truck: ' + str(total_trucks) + ' Bus: ' + str(total_bus) + ' Person: ' + str(total_person),
+                    'Vehicles:' + str(total_passed_vehicle) + ' Car up:' + str(total_cars[0]) + ' C down:'+str(total_cars[1])+' Truck up:' + str(total_trucks[0]) +' T down:' + str(total_trucks[1]),
 
                     (10, 35),
+                    font,
+                    0.8,
+                    (0, 0xFF, 0xFF),
+                    2,
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    )
+                cv2.putText(
+                    input_frame,
+                    'Bus up:' + str(total_bus[0]) + ' B d:' + str(total_bus[1]) + ' P up:' + str(total_person[0])+ ' P down:' + str(total_person[1])+ ' Bike up:' + str(total_motorcycle[0])+ ' B down:' + str(total_motorcycle[1]),
+
+                    (10, 55),
                     font,
                     0.8,
                     (0, 0xFF, 0xFF),
@@ -188,72 +216,23 @@ def object_detection_function():
 
                 # when the vehicle passed over line and counted, make the color of ROI line green
                 if sum(counter) == 1:
-                    cv2.line(input_frame, (0, 390), (720, 390), (0, 0xFF, 0), 5)
+                    cv2.line(input_frame, (0, roi), (width, roi), (0, 0xFF, 0), 5)
                 else:
-                    cv2.line(input_frame, (0, 390), (720, 390), (0, 0, 0xFF), 5)
+                    cv2.line(input_frame, (0, roi), (width, roi), (0, 0, 0xFF), 5)
 
                 # insert information text to video frame
-                cv2.rectangle(input_frame, (10, 275), (230, 337), (180, 132, 109), -1)
+                
                 cv2.putText(
                     input_frame,
                     'ROI Line',
-                    (650, 380),
+                    (width-100, roi-40),
                     font,
                     0.6,
                     (0, 0, 0xFF),
                     2,
                     cv2.LINE_AA,
                     )
-                cv2.putText(
-                    input_frame,
-                    'LAST PASSED VEHICLE INFO',
-                    (11, 290),
-                    font,
-                    0.5,
-                    (0xFF, 0xFF, 0xFF),
-                    1,
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    )
-                cv2.putText(
-                    input_frame,
-                    '-Movement Direction: ' + direction,
-                    (14, 302),
-                    font,
-                    0.4,
-                    (0xFF, 0xFF, 0xFF),
-                    1,
-                    cv2.FONT_HERSHEY_COMPLEX_SMALL,
-                    )
-                cv2.putText(
-                    input_frame,
-                    '-Speed(km/h): ' + speed,
-                    (14, 312),
-                    font,
-                    0.4,
-                    (0xFF, 0xFF, 0xFF),
-                    1,
-                    cv2.FONT_HERSHEY_COMPLEX_SMALL,
-                    )
-                cv2.putText(
-                    input_frame,
-                    '-Color: ' + color,
-                    (14, 322),
-                    font,
-                    0.4,
-                    (0xFF, 0xFF, 0xFF),
-                    1,
-                    cv2.FONT_HERSHEY_COMPLEX_SMALL,
-                    )
-                cv2.putText(
-                    input_frame,
-                    '-Vehicle Size/Type: ' + size,
-                    (14, 332),
-                    font,
-                    0.4,
-                    (0xFF, 0xFF, 0xFF),
-                    1,
-                    cv2.FONT_HERSHEY_COMPLEX_SMALL,
-                    )
+                
                 vid_writer.write(input_frame.astype(np.uint8))
                 cv2.imshow('vehicle detection', input_frame)
 
