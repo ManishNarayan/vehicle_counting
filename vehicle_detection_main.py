@@ -69,7 +69,7 @@ total_passed_vehicle = 0  # using it to count vehicles
 # By default I use an "SSD with Mobilenet" model here. See the detection model zoo (https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md) for a list of other models that can be run out-of-the-box with varying speeds and accuracies.
 # What model to download.
 if(args.model):
-    if not os.path.isfile(args.model):
+    if not os.path.exists(args.model):
         print("Input model ", args.model, " doesn't exist")
         sys.exit(1)
     MODEL_NAME = args.model
