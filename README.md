@@ -20,6 +20,7 @@ This gives a classified count of the different vehicles - Cars, Trucks, Buses an
 To run the file use the command : 
 #### python survey_upd.py --csv csv_file --model model_name --outpath path_to_the_folder_to_store_csv --outfile filename.csv
 
+The model argument is optional and Faster_RCNN_resnet50 is the default model.
 Make sure you give a unique file name otherwise it will be overwritten.
 You also need to have the permissions to download/open the video in the video link of the csv file.
 
