@@ -1,5 +1,7 @@
 FROM tensorflow/tensorflow
 
+RUN apt-get update && apt-get install -y apt-transport-https
+
 RUN apt update -y && apt install -y \
 python3-dev \
 libsm6 \
