@@ -234,7 +234,7 @@ def object_detection_function():
                     )
                 
                 vid_writer.write(input_frame.astype(np.uint8))
-                cv2.imshow('vehicle detection', input_frame)
+                #cv2.imshow('vehicle detection', input_frame)
 
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
