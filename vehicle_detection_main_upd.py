@@ -45,9 +45,11 @@ if tf.__version__ < '1.14.0':
 
 # Detection
 def object_detection_function(video_link,model_name,id):
-    
-    filename = "video_" + str(id) + "_.mp4"
+   
+    filename = "video_" + str(id) + "_upd.mp4"
     #filename = "video_1_61.mp4"
+    #print(video_link,filename);
+
     urllib.request.urlretrieve(video_link,filename)
     cap = cv2.VideoCapture(filename)
     #Use these if you want to know the height and width of the video and set the ROI line Accordingly.
@@ -55,6 +57,8 @@ def object_detection_function(video_link,model_name,id):
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     width  = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     roi    = int(height*2/3)
+    if(height == 1080):
+        roi = 650
     fps    = int(cap.get(cv2.CAP_PROP_FPS))
     
     
@@ -93,7 +97,7 @@ def object_detection_function(video_link,model_name,id):
     categories = label_map_util.convert_label_map_to_categories(label_map,
             max_num_classes=NUM_CLASSES, use_display_name=True)
     category_index = label_map_util.create_category_index(categories)
-    outputFile  = filename[-4] + "Faster_out_py.avi"
+    outputFile  = filename + "_Faster_out.avi"
     total_passed_vehicle = 0
     total_cars = [0]*2
     total_trucks = [0]*2
@@ -120,7 +124,7 @@ def object_detection_function(video_link,model_name,id):
             num_detections = detection_graph.get_tensor_by_name('num_detections:0')
 
             # for all the frames that are extracted from input video
-            vid_writer = cv2.VideoWriter(outputFile, cv2.VideoWriter_fourcc('M','J','P','G'), 30, (round(cap.get(cv2.CAP_PROP_FRAME_WIDTH)),round(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))))
+            vid_writer = cv2.VideoWriter(outputFile, cv2.VideoWriter_fourcc('M','J','P','G'), 30,(width,height))
             while cap.isOpened():
                 (ret, frame) = cap.read()
 
@@ -179,7 +183,7 @@ def object_detection_function(video_link,model_name,id):
                     (10, 35),
                     font,
                     0.8,
-                    (0, 0xFF, 0xFF),
+                    (0, 0xFF,0),
                     2,
                     cv2.FONT_HERSHEY_SIMPLEX,
                     )
@@ -190,7 +194,7 @@ def object_detection_function(video_link,model_name,id):
                     (10, 55),
                     font,
                     0.8,
-                    (0, 0xFF, 0xFF),
+                    (0, 0xFF, 0),
                     2,
                     cv2.FONT_HERSHEY_SIMPLEX,
                     )
@@ -215,7 +219,7 @@ def object_detection_function(video_link,model_name,id):
                     )
 
                 vid_writer.write(input_frame.astype(np.uint8))
-                cv2.imshow('vehicle detection', input_frame)
+                #cv2.imshow('vehicle detection', input_frame)
 
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
@@ -228,6 +232,11 @@ def object_detection_function(video_link,model_name,id):
                         writer.writerows([csv_line.split(',')])
             cap.release()
             cv2.destroyAllWindows()
+
+	    #time2 = cv2.getTickCount()
+	    #time = (time2-time1)/ cv2.getTickFrequency()
+
+	    #print("Total Time taken to process the video :",time) 
             return ([total_cars[0],total_cars[1],total_person[0],total_person[1],total_motorcycle[0],total_motorcycle[1],total_trucks[0],total_trucks[1]])
 
 

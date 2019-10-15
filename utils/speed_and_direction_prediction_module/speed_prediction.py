@@ -1,3 +1,4 @@
+
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # ----------------------------------------------
@@ -26,20 +27,19 @@ def predict_speed(
     scale_constant = 1  # manual scaling because we did not performed camera calibration
     isInROI = True  # is the object that is inside Region Of Interest
     update_csv = False
-    
-    if bottom < 250:
-        scale_constant = 1  # scale_constant is used for manual scaling because we did not performed camera calibration
-    elif bottom > 250 and bottom <500 :
-        scale_constant = 2  # scale_constant is used for manual scaling because we did not performed camera calibration
+    Counted = False
+
+    if bottom < (roi_position + 150):
+        scale_constant = 1
     else:
         isInROI = False
     
     if len(bottom_position_of_detected_vehicle) != 0 and bottom \
-        - bottom_position_of_detected_vehicle[0] > 0 and 390 \
+        - bottom_position_of_detected_vehicle[0] > 0 and (roi_position + 4) \
         < bottom_position_of_detected_vehicle[0] \
-        and bottom_position_of_detected_vehicle[0] < 400 \
+        and bottom_position_of_detected_vehicle[0] < (roi_position + 7.5) \
         and roi_position < bottom:
-        
+        Counted = True
         is_vehicle_detected.insert(0, 1)
         update_csv = True
         image_saver.save_image(crop_img)  # save detected vehicle image
@@ -63,4 +63,6 @@ def predict_speed(
             current_frame_number_list.insert(0, current_frame_number)
             bottom_position_of_detected_vehicle.insert(0, bottom)
 
+    if Counted :
+        bottom_position_of_detected_vehicle[0] += 10
     return (direction, speed, is_vehicle_detected, update_csv)
