@@ -32,6 +32,7 @@ import flask
 
 import urllib.request
 
+_folder_path = "/media/abc/28612305-1594-4336-82c6-364e19ec4658/veh-count-videos/"
 # initialize .csv
 with open('traffic_measurement.csv', 'w') as f:
     writer = csv.writer(f)
@@ -45,10 +46,10 @@ if tf.__version__ < '1.14.0':
 
 # Detection
 def object_detection_function(video_link,model_name,id):
-   
+    global _folder_path
     filename = "video_" + str(id) + "_upd.mp4"
     #filename = "video_1_61.mp4"
-    #print(video_link,filename);
+    print("processing..",filename);
 
     urllib.request.urlretrieve(video_link,filename)
     cap = cv2.VideoCapture(filename)

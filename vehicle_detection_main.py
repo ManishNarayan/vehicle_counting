@@ -55,13 +55,13 @@ if(args.video):
 else:
     print("Error . Please Provide a video file as an argument.")
     sys.exit(1)
-outputFile  = args.video[:-4] + "new_upd.avi"
+outputFile  = args.video[:-4] + "new_cur_roi.avi"
 
 #Use these if you want to know the height and width of the video and set the ROI line Accordingly.
 height = int( cap.get(cv2.CAP_PROP_FRAME_HEIGHT ))
-roi =  int(((height)*2)/3) - 110
+roi =  int(((height)*2)/3)
 if(height == 1080):
-    roi = 620
+    roi = 650
 
 width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 vis_util.helper(roi)

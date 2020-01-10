@@ -35,9 +35,9 @@ def predict_speed(
         isInROI = False
     
     if len(bottom_position_of_detected_vehicle) != 0 and bottom \
-        - bottom_position_of_detected_vehicle[0] > 0 and (roi_position + 4) \
+        - bottom_position_of_detected_vehicle[0] > 0 and (roi_position + 2) \
         < bottom_position_of_detected_vehicle[0] \
-        and bottom_position_of_detected_vehicle[0] < (roi_position + 7.5) \
+        and bottom_position_of_detected_vehicle[0] < (roi_position + 10) \
         and roi_position < bottom:
         Counted = True
         is_vehicle_detected.insert(0, 1)
